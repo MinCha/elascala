@@ -1,2 +1,2 @@
 # elascala
-Simple &amp; Well Abstracted Elasticsearch Scala Client
+Simple &amp; Well Abstracted Elasticsearch Scala Client :)
