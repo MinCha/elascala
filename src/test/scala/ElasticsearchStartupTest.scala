@@ -9,15 +9,9 @@ import org.scalatest.junit.JUnitSuite
 /**
  * Created by vayne on 15. 2. 9..
  */
-class ElasticsearchStartupTest extends JUnitSuite {
-  var client: Client = _
+class ElasticsearchStartupTest extends ESIntegrationTest {
   val Index = "some_index"
   val Typez = "some_type"
-
-  @Before def startUpES() {
-    val node = nodeBuilder.local(true).node;
-    client = node.client
-  }
 
   @Test def sayHelloToES() {
     val result = client.prepareIndex(Index, Typez).setSource(
@@ -29,9 +23,5 @@ class ElasticsearchStartupTest extends JUnitSuite {
     assert(result.getId.isEmpty == false)
     assert(result.getIndex == Index)
     assert(result.getType == Typez)
-  }
-
-  @After def endUpES() {
-    client.close
   }
 }
