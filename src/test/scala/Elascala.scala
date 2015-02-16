@@ -1,6 +1,6 @@
-import com.google.gson.{JsonObject, Gson}
-import org.slf4j.Logger
+import com.google.gson.Gson
 
+import scala.collection.JavaConverters._
 import scalaj.http.Http
 
 /**
@@ -14,8 +14,9 @@ class Elascala(host: String, port: Int) {
   def update(key: String, value: AnyVal) = ???
 
   def insert(p: Map[String, String])(implicit index: ElascalaIndexType): String = {
-    val json = new Gson().toJson(new JsonObject(p))
+    val json = new Gson().toJson(p.asJava)
     println(json)
+
     Http(url + index.uri).method("put").postData(json).asString.contentType.get
   }
 }
