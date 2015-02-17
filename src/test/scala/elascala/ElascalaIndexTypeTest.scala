@@ -1,3 +1,5 @@
+package elascala
+
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 

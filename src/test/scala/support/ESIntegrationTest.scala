@@ -1,5 +1,6 @@
 package support
 
+import elascala.ElascalaIndexType
 import org.elasticsearch.client.Client
 import org.elasticsearch.common.settings.ImmutableSettings
 import org.elasticsearch.node.NodeBuilder._
@@ -11,6 +12,8 @@ import org.scalatest.junit.JUnitSuite
  */
 abstract class ESIntegrationTest extends JUnitSuite {
   var client: Client = _
+  val url = "http://localhost:9200"
+  implicit val index = new ElascalaIndexType("elascala", "persons")
 
   @Before def startUp() {
     val settings = ImmutableSettings.settingsBuilder

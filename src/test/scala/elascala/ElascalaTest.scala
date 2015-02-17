@@ -1,12 +1,13 @@
+package elascala
+
 import org.junit.Test
-import support.{Person, ESIntegrationTest}
+import support.{ESIntegrationTest, Person}
 
 /**
  * Created by vayne on 15. 2. 16..
  */
 class ElascalaTest extends ESIntegrationTest {
   val sut = new Elascala("http://127.0.0.1", 9200)
-  implicit val index = ElascalaIndexType("elascala", "persons")
 
   @Test def canUpdate() {
     val inserted = sut.insert(Map("name" -> "vayne", "sex" -> "male"))
@@ -19,4 +20,3 @@ class ElascalaTest extends ESIntegrationTest {
     assert(person.sex == "male")
   }
 }
-

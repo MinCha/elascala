@@ -1,3 +1,5 @@
+package elascala
+
 import com.google.gson.Gson
 
 /**
@@ -45,4 +47,8 @@ case class GetResult(private val _index: String,
   def version = _version
 
   def source[T](classz: Class[T]): T = new Gson().fromJson(_source.toString, classz)
+}
+
+case class HttpResult(code: Int, body: String) {
+  def to[T](classz: Class[T]): T = new Gson().fromJson(body, classz)
 }

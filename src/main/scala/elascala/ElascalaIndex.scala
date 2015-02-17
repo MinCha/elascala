@@ -1,3 +1,5 @@
+package elascala
+
 /**
  * Created by vayne on 15. 2. 16..
  */
