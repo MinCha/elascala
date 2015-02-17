@@ -1,4 +1,7 @@
+package support
+
 import org.elasticsearch.client.Client
+import org.elasticsearch.common.settings.ImmutableSettings
 import org.elasticsearch.node.NodeBuilder._
 import org.junit.{After, Before}
 import org.scalatest.junit.JUnitSuite
@@ -10,7 +13,11 @@ abstract class ESIntegrationTest extends JUnitSuite {
   var client: Client = _
 
   @Before def startUp() {
-    val node = nodeBuilder.local(true).node
+    val settings = ImmutableSettings.settingsBuilder
+      .put("script.disable_dynamic", false)
+      .put("script.default_lang", "groovy")
+      .build()
+    val node = nodeBuilder.local(true).settings(settings).node
     client = node.client
   }
 
