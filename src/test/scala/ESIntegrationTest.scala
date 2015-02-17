@@ -10,7 +10,7 @@ abstract class ESIntegrationTest extends JUnitSuite {
   var client: Client = _
 
   @Before def startUp() {
-    val node = nodeBuilder.local(true).node;
+    val node = nodeBuilder.local(true).node
     client = node.client
   }
 
