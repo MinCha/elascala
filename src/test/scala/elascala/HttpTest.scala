@@ -1,10 +1,9 @@
 package elascala
 
-import com.google.gson.Gson
 import org.junit.Test
 import support.ESIntegrationTest
+
 import scala.collection.JavaConverters._
-import scalaj.http.Http
 
 /**
  * Created by Vayne on 2015-02-18.
@@ -21,5 +20,11 @@ class HttpTest extends ESIntegrationTest {
     val result = HttpClient.get("https://github.com")
 
     assert(result.code == 200)
+  }
+
+  @Test def canKnowNotFound() {
+    val result = HttpClient.get("https://github.com/no-existing")
+
+    assert(result.code == 404)
   }
 }

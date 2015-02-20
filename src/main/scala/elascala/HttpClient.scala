@@ -2,7 +2,8 @@ package elascala
 
 import org.slf4j.LoggerFactory
 
-import scalaj.http.{HttpResponse, Http}
+import scala.collection.JavaConverters._
+import scalaj.http.{Http, HttpResponse}
 
 /**
  * Created by Vayne on 2015-02-18.
@@ -12,8 +13,19 @@ object HttpClient {
 
   def get(url: String): HttpResult = {
     execute(url, "") {
-      Http(url).asString
+      http(url).asString
     }
+  }
+
+  private def http(url: String) = {
+    Http(url).timeout(5000, 5000)
+  }
+
+  private def execute(url: Any, body: Any)(f: => HttpResponse[String]): HttpResult = {
+    val result = f
+    logger.info("url: {}, body: {} => status: {}",
+      List(url, body, result.code).asJava.toArray: _*)
+    HttpResult(result.code, result.body)
   }
 
   def put(url: String, any: Any): HttpResult = {
@@ -22,20 +34,13 @@ object HttpClient {
 
   def put(url: String, body: String): HttpResult = {
     execute(url, body) {
-      Http(url).method("put").postData(body).asString
+      http(url).method("put").postData(body).asString
     }
   }
 
   def post(url: String, body: String): HttpResult = {
     execute(url, body) {
-      Http(url).method("post").postData(body).asString
+      http(url).method("post").postData(body).asString
     }
-  }
-
-  private def execute(url: Any, body: Any)(f: => HttpResponse[String]): HttpResult = {
-    logger.info("url: {}, body: {}", url, body)
-    val result = f
-    logger.info("url: {}, status: {}", url, result.code)
-    HttpResult(result.code, result.body)
   }
 }
