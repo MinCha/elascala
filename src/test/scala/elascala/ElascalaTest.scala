@@ -1,5 +1,7 @@
 package elascala
 
+import java.util.Date
+
 import org.junit.Test
 import support.{ESIntegrationTest, Person}
 
@@ -10,7 +12,7 @@ class ElascalaTest extends ESIntegrationTest {
   val sut = new Elascala("http://127.0.0.1", 9200)
 
   @Test def canUpdate() {
-    val inserted = sut.insert(Map("name" -> "vayne", "sex" -> "male"))
+    val inserted = sut.insert(("name" -> "vayne"), ("sex" -> "male"))
 
     sut.update(inserted.id, "name", "vayne.q")
 
@@ -18,5 +20,23 @@ class ElascalaTest extends ESIntegrationTest {
     val person = result.source(classOf[Person])
     assert(person.name == "vayne.q")
     assert(person.sex == "male")
+  }
+
+  @Test def canMultipleUpdates() {
+    val inserted = sut.insert(("name" -> "vayne"), ("sex" -> "male"), ("age" -> 20))
+
+    sut.update(inserted.id, ("name", "vayne.q"), ("sex", "female"), ("age" -> 35))
+
+    val result = sut.select(inserted.id)
+    val person = result.source(classOf[Person])
+    assert(person.name == "vayne.q")
+    assert(person.sex == "female")
+    assert(person.age == 35)
+  }
+
+  @Test(expected = classOf[ElascalaException]) def shouldThrowIWhenNonExistingKey() {
+    val inserted = sut.insert(("name" -> "vayne"), ("sex" -> "male"))
+
+    sut.update(inserted.id, "age", "someValue")
   }
 }

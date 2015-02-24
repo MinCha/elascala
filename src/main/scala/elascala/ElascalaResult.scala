@@ -51,4 +51,7 @@ case class GetResult(private val _index: String,
 
 case class HttpResult(code: Int, body: String) {
   def to[T](classz: Class[T]): T = new Gson().fromJson(body, classz)
+
+  //TODO Need to improve expression
+  def ok = code >= 200 && code < 300
 }
