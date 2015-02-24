@@ -22,9 +22,7 @@ class HttpTest extends ESIntegrationTest {
     assert(result.code == 200)
   }
 
-  @Test def canKnowNotFound() {
-    val result = HttpClient.get("https://github.com/no-existing")
-
-    assert(result.code == 404)
+  @Test(expected = classOf[ElascalaException]) def canKnowNotFound() {
+    HttpClient.get("https://github.com/no-existing")
   }
 }
