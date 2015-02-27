@@ -2,8 +2,8 @@ package elascala
 
 import com.google.gson.Gson
 
+import elascala.ESJsonExpression._
 import scala.collection.JavaConverters._
-import scalaj.http.Http
 
 /**
  * Created by vayne on 15. 2. 16..
@@ -20,23 +20,29 @@ class Elascala(host: String, port: Int) {
     update(id, (key, value))
   }
 
-  def update(id: String, keyValues: Tuple2[String, Any]*)(implicit index: ElascalaIndexType): PostResult = {
+  def update(id: String, keyValues: (String, Any)*)(implicit index: ElascalaIndexType): PostResult = {
     val wholeUrl = url + index.uri + "/" + id + "/_update"
-    val template = """ctx._source.%s = %s"""
-    val parameters = for (x <- keyValues) yield {
-      x match {
-        case s: (String, String) => template.format(x._1, "'" + x._2 + "'") + ";"
-        case _ => template.format(x._1, x._2) + ";"
-      }
-    }
-    val body = """{"script" : "%s"}""".format(parameters.mkString)
+    val parameters = for (x <- keyValues) yield
+      UpdateScriptFragment.format(x._1, wrap(x._2)) + ";"
+    val body = UpdateTemplate.format(parameters.mkString, "")
     val result = HttpClient.post(wholeUrl, body).to(classOf[PostResult])
     require(result.id == id)
 
     result
   }
 
-  def insert(p: Tuple2[String, Any]*)(implicit index: ElascalaIndexType): PutResult = {
+  def upsert(id: String, keyValues: (String, Any)*)(implicit index: ElascalaIndexType): PostResult = {
+    val wholeUrl = url + index.uri + "/" + id + "/_update"
+    val update = for (x <- keyValues) yield UpdateScriptFragment.format(x._1, wrap(x._2)) + ";"
+    val upsert = for (x <- keyValues) yield UpdateUpsertFragment.format(x._1, wrap2(x._2)) + ","
+    val body = UpdateTemplate.format(update.mkString, upsert.mkString.dropRight(1))
+    val result = HttpClient.post(wholeUrl, body).to(classOf[PostResult])
+    require(result.id == id)
+
+    result
+  }
+
+  def insert(p: (String, Any)*)(implicit index: ElascalaIndexType): PutResult = {
     val result = HttpClient.put(url + index.uri, p.toMap.asJava).to(classOf[PutResult])
     require(result.created, result.toString)
     result

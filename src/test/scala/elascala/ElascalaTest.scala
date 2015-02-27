@@ -25,7 +25,7 @@ class ElascalaTest extends ESIntegrationTest {
   @Test def canMultipleUpdates() {
     val inserted = sut.insert(("name" -> "vayne"), ("sex" -> "male"), ("age" -> 20))
 
-    sut.update(inserted.id, ("name", "vayne.q"), ("sex", "female"), ("age" -> 35))
+    sut.update(inserted.id, ("name" -> "vayne.q"), ("sex" -> "female"), ("age" -> 35))
 
     val result = sut.select(inserted.id)
     val person = result.source(classOf[Person])
@@ -38,5 +38,26 @@ class ElascalaTest extends ESIntegrationTest {
     val inserted = sut.insert(("name" -> "vayne"), ("sex" -> "male"))
 
     sut.update(inserted.id, "age", "someValue")
+  }
+
+  @Test def canUpsert() {
+    val inserted = sut.upsert("someId", ("name" -> "vayne"), ("sex" -> "male"), ("age" -> 20))
+
+    val result = sut.select(inserted.id)
+    val person = result.source(classOf[Person])
+    assert(person.name == "vayne")
+    assert(person.sex == "male")
+    assert(person.age == 20)
+  }
+
+  @Test def canUpsertWhenAlreadyKey() {
+    val inserted = sut.insert(("name" -> "vayne"), ("sex" -> "male"))
+
+    sut.upsert(inserted.id, ("name" -> "vayne.q"))
+
+    val result = sut.select(inserted.id)
+    val person = result.source(classOf[Person])
+    assert(person.name == "vayne.q")
+    assert(person.sex == "male")
   }
 }
