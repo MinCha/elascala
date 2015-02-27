@@ -60,4 +60,8 @@ class ElascalaTest extends ESIntegrationTest {
     assert(person.name == "vayne.q")
     assert(person.sex == "male")
   }
+
+  @Test def canRefresh() {
+    sut.refresh(index.index)
+  }
 }

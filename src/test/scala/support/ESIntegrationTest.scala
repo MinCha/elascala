@@ -13,7 +13,7 @@ import org.scalatest.junit.JUnitSuite
 abstract class ESIntegrationTest extends JUnitSuite {
   var client: Client = _
   val url = "http://localhost:9200"
-  implicit val index = new ElascalaIndexType("elascala", "persons")
+  implicit val index = ElascalaIndexType("elascala", "persons")
 
   @Before def startUp() {
     val settings = ImmutableSettings.settingsBuilder
