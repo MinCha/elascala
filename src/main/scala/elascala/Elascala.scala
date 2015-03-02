@@ -2,7 +2,6 @@ package elascala
 
 import com.google.gson.Gson
 
-import elascala.ESJsonExpression._
 import scala.collection.JavaConverters._
 
 /**
@@ -21,22 +20,18 @@ class Elascala(domain: String, port: Int) {
   }
 
   def update(id: String, keyValues: (String, Any)*)(implicit index: ElascalaIndexType): PostResult = {
-    val url = host + index.uri + "/" + id + "/_update"
-    val parameters = for (x <- keyValues) yield
-      UpdateScriptFragment.format(x._1, wrap(x._2)) + ";"
-    val body = UpdateTemplate.format(parameters.mkString, "")
-    val result = HttpClient.post(url, body).to(classOf[PostResult])
-    require(result.id == id)
-
-    result
+    val json = ESJsonBuilder.update(keyValues:_*).build
+    update(id, json)
   }
 
   def upsert(id: String, keyValues: (String, Any)*)(implicit index: ElascalaIndexType): PostResult = {
+    val json = ESJsonBuilder.update(keyValues:_*).upsert(keyValues:_*).build
+    update(id, json)
+  }
+
+  def update(id: String, json: String)(implicit index: ElascalaIndexType): PostResult = {
     val url = host + index.uri + "/" + id + "/_update"
-    val update = for (x <- keyValues) yield UpdateScriptFragment.format(x._1, wrap(x._2)) + ";"
-    val upsert = for (x <- keyValues) yield UpdateUpsertFragment.format(x._1, wrap2(x._2)) + ","
-    val body = UpdateTemplate.format(update.mkString, upsert.mkString.dropRight(1))
-    val result = HttpClient.post(url, body).to(classOf[PostResult])
+    val result = HttpClient.post(url, json).to(classOf[PostResult])
     require(result.id == id)
 
     result

@@ -1,7 +1,5 @@
 package elascala
 
-import java.util.Date
-
 import org.junit.Test
 import support.{ESIntegrationTest, Person}
 
@@ -45,6 +43,19 @@ class ElascalaTest extends ESIntegrationTest {
 
     val result = sut.select(inserted.id)
     val person = result.source(classOf[Person])
+    assert(person.name == "vayne")
+    assert(person.sex == "male")
+    assert(person.age == 20)
+  }
+
+  @Test def canUpsertPassingJson() {
+    val json = ESJsonBuilder.update(("name" -> "vayne.q"))
+                          .upsert(("name" -> "vayne"), ("sex" -> "male"), ("age" -> 20)).build
+    val inserted = sut.update("someId", json)
+
+    val result = sut.select(inserted.id)
+    val person = result.source(classOf[Person])
+
     assert(person.name == "vayne")
     assert(person.sex == "male")
     assert(person.age == 20)
